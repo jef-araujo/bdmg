@@ -98,8 +98,8 @@ begin
     ColWidths[2] := 320;
     ColWidths[3] := 100;
     ColWidths[4] := 80;
-    ColWidths[5] := 110;
-    ColWidths[6] := 110;
+    ColWidths[5] := 130;
+    ColWidths[6] := 130;
   end;
 end;
 

@@ -44,3 +44,10 @@ CREATE TABLE Tarefas (
   Obs.: se `ConectarPeloWindows` estiver com o valor 1, a conexão ao SQLServer será feita via Windows Authentication, caso contrário sera utilizado os valores informados em `UserName` e `Password`;
 
 > bdmg\cliente\bin\appconfig.ini
+
+
+## TO-DO
+- Faltou implementar:
+  - a paginação da consulta na grid
+  - melhorar a exibição de dados na funcionalidade "Alterar Status"
+  - utilizar uma grid melhor que pudesser ser feito ordenação e pesquisa nos registros.

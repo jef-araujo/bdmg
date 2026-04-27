@@ -84,10 +84,10 @@ begin
   Result.AddPair('descricao', TJSONString.Create(FDescricao));
   Result.AddPair('status', TJSONString.Create(StatusAsString));
   Result.AddPair('prioridade', TJSONNumber.Create(FPrioridade));
-  Result.AddPair('dataCriacao', TJSONString.Create(FormatDateTime('yyyy-mm-dd"T"hh:nn:ss', FDataCriacao)));
+  Result.AddPair('dataCriacao', TJSONString.Create(FormatDateTime('dd/mm/yyyy hh:nn:ss', FDataCriacao)));
 
   if FDataConclusao > 0 then
-    Result.AddPair('dataConclusao', TJSONString.Create(FormatDateTime('yyyy-mm-dd"T"hh:nn:ss', FDataConclusao)))
+    Result.AddPair('dataConclusao', TJSONString.Create(FormatDateTime('dd/mm/yyyy hh:nn:ss', FDataConclusao)))
   else
     Result.AddPair('dataConclusao', TJSONNull.Create);
 end;
