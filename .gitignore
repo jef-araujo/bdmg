@@ -1,0 +1,23 @@
+# Executáveis Delphi
+*.exe
+*.dll
+
+# Configurações de ambiente
+*.dsk
+*.identcache
+*.local
+
+# Arquivos temporários
+*.~*.*  
+*.~*     
+
+# Arquivos de unidade compilados
+*.dcu
+
+# pasta __history do Delphi
+__history/
+# pasta recovery do Delphi
+__recovery/
+
+# pasta modules do boss
+modules/

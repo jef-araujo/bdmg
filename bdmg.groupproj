@@ -1,0 +1,48 @@
+﻿<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+    <PropertyGroup>
+        <ProjectGuid>{F9EE7333-643D-4461-AB4D-E881C996B8C4}</ProjectGuid>
+    </PropertyGroup>
+    <ItemGroup>
+        <Projects Include="cliente\AplicacaoCliente.dproj">
+            <Dependencies/>
+        </Projects>
+        <Projects Include="servico\servico.dproj">
+            <Dependencies/>
+        </Projects>
+    </ItemGroup>
+    <ProjectExtensions>
+        <Borland.Personality>Default.Personality.12</Borland.Personality>
+        <Borland.ProjectType/>
+        <BorlandProject>
+            <Default.Personality/>
+        </BorlandProject>
+    </ProjectExtensions>
+    <Target Name="AplicacaoCliente">
+        <MSBuild Projects="cliente\AplicacaoCliente.dproj"/>
+    </Target>
+    <Target Name="AplicacaoCliente:Clean">
+        <MSBuild Projects="cliente\AplicacaoCliente.dproj" Targets="Clean"/>
+    </Target>
+    <Target Name="AplicacaoCliente:Make">
+        <MSBuild Projects="cliente\AplicacaoCliente.dproj" Targets="Make"/>
+    </Target>
+    <Target Name="servico">
+        <MSBuild Projects="servico\servico.dproj"/>
+    </Target>
+    <Target Name="servico:Clean">
+        <MSBuild Projects="servico\servico.dproj" Targets="Clean"/>
+    </Target>
+    <Target Name="servico:Make">
+        <MSBuild Projects="servico\servico.dproj" Targets="Make"/>
+    </Target>
+    <Target Name="Build">
+        <CallTarget Targets="AplicacaoCliente;servico"/>
+    </Target>
+    <Target Name="Clean">
+        <CallTarget Targets="AplicacaoCliente:Clean;servico:Clean"/>
+    </Target>
+    <Target Name="Make">
+        <CallTarget Targets="AplicacaoCliente:Make;servico:Make"/>
+    </Target>
+    <Import Project="$(BDS)\Bin\CodeGear.Group.Targets" Condition="Exists('$(BDS)\Bin\CodeGear.Group.Targets')"/>
+</Project>

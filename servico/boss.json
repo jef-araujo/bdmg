@@ -1,0 +1,14 @@
+{
+	"name": "servico",
+	"description": "",
+	"version": "1.0.0",
+	"homepage": "",
+	"mainsrc": "./src",
+	"projects": [],
+	"dependencies": {
+		"github.com/hashload/horse": "^3.2.0",
+		"github.com/hashload/horse-basic-auth": "^1.2.5",
+		"github.com/hashload/horse-cors": "^1.0.7",
+		"github.com/hashload/jhonson": "^1.2.1"
+	}
+}
