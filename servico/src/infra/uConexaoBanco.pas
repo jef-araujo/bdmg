@@ -63,9 +63,9 @@ begin
     FConn.LoginPrompt := False;
     FConn.ConnectionString := Format(
       'Provider=SQLOLEDB.1;' +
-      'Server=%s;' +
+      'Server=%s,%d;' +
       'Initial Catalog=%s;',
-      [Config.Server, Config.Database]);
+      [Config.Server, Config.Port, Config.Database]);
 
     if Config.ConectaPeloWindows then
     begin
@@ -86,20 +86,23 @@ end;
 
 function TConexaoBanco.GetConnection: TADOConnection;
 begin
-  ConfigurarConexao;
-  if FConn.Connected = False then
-  begin
-    TLogger.LogarEmTela('conectando ao banco');
-    try
+  try
+    ConfigurarConexao;
+    if FConn.Connected = False then
+    begin
+      TLogger.LogarEmTela('conectando ao banco');
+
       FConn.Connected := True;
-    except
-      on e: Exception do
-      begin
-        TLogger.LogarEmTela('erro ao conectar no banco de dados: ' + e.message);
-      end;
+      TLogger.LogarEmTela('conexão com sucesso ao banco de dados!');
+    end;
+    Result := FConn;
+  except
+    on e: Exception do
+    begin
+      TLogger.LogarEmTela('erro ao conectar no banco de dados: ' + e.message);
+      raise;
     end;
   end;
-  Result := FConn;
 end;
 
 initialization

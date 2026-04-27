@@ -55,7 +55,7 @@ begin
   THorse.Get('/',
     procedure(Req: THorseRequest; Res: THorseResponse; Next: TProc)
     begin
-      Res.Send('{"message":"Serviço rodando com autenticação,"status":"online"}')
+      Res.Send('{"message":"Serviço rodando com autenticação","status":"online"}')
          .Status(200);
     end);
 

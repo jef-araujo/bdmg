@@ -141,6 +141,7 @@ var
  Service: TTarefaService;
  Json: TJSONObject;
 begin
+ Json := nil;
  Service := TTarefaService.Create;
  try
    try
