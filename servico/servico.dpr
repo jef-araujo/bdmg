@@ -1,4 +1,4 @@
-program servico;
+Ôªøprogram servico;
 
 {$APPTYPE CONSOLE}
 
@@ -22,7 +22,7 @@ uses
 procedure ConfigurarCORS;
 begin
   HorseCORS
-    .AllowedOrigin('*')           // Pode mudar para 'http://localhost:8080' depois
+    .AllowedOrigin('*')
     .AllowedCredentials(true)
     .AllowedHeaders('*')
     .AllowedMethods('GET, POST, PUT, DELETE, OPTIONS')
@@ -31,7 +31,21 @@ end;
 
 procedure teste(Req: THorseRequest; Res: THorseResponse; Next: TProc);
 begin
-  Res.Send('Listar todas as tarefas - EM IMPLEMENTA«√O').Status(200);
+  raise Exception.Create('Error Message');
+  Res.Send('Listar todas as tarefas - EM IMPLEMENTA√á√ÉO').Status(200);
+end;
+
+procedure GlobalExceptionMiddleware(Req: THorseRequest; Res: THorseResponse; Next: TProc);
+begin
+  try
+    Next;
+  except
+    on E: Exception do
+    begin
+      TLogger.LogarEmTela(Format('Erro na rota %s %s: %s', [Req.RawWebRequest.Method, Req.PathInfo, E.Message]));
+      raise;
+    end;
+  end;
 end;
 
 procedure ConfigurarRotas;
@@ -48,14 +62,14 @@ begin
         Result := (AUsername = USER_TESTE) and (APassword = PASS_TESTE);
       end));
 
-
   THorse.Use(CORS);
   THorse.Use(Jhonson);
+  THorse.Use(GlobalExceptionMiddleware);
 
   THorse.Get('/',
     procedure(Req: THorseRequest; Res: THorseResponse; Next: TProc)
     begin
-      Res.Send('{"message":"ServiÁo rodando com autenticaÁ„o","status":"online"}')
+      Res.Send('{"message":"Servi√ßo rodando com autentica√ß√£o","status":"online"}')
          .Status(200);
     end);
 
@@ -72,29 +86,28 @@ end;
 
 procedure IniciarServidor;
 var
-  LPort: Integer;
+  Port: Integer;
 begin
-  LPort := TConfig.GetInstance.AppPort;
+  Port := TConfig.GetInstance.AppPort;
 
-  TLogger.LogarEmTela('Iniciando ServiÁo...');
-  TLogger.LogarEmTela('Carregando configuraÁıes do arquivo config.ini');
-  TLogger.LogarEmTela('Tentando iniciar servidor na porta: ' + LPort.ToString);
+  TLogger.LogarEmTela('Iniciando Servi√ßo...');
+  TLogger.LogarEmTela('Carregando configura√ß√µes do arquivo config.ini');
 
+  TLogger.LogarEmTela('Tentando iniciar servidor na porta: ' + Port.ToString);
   try
-    THorse.Listen(LPort,
+    THorse.Listen(Port,
       procedure
       begin
-        TLogger.LogarEmTela('ServiÁo iniciado com sucesso!');
-        TLogger.LogarEmTela('URL: http://localhost:' + LPort.ToString);
+        TLogger.LogarEmTela('Servi√ßo iniciado com sucesso!');
+        TLogger.LogarEmTela('URL: http://localhost:' + Port.ToString);
         TLogger.LogarEmTela('Pressione Ctrl+C para parar o servidor.');
-      end,
-      nil);   // callback de stop
+      end);
 
   except
     on E: EIdCouldNotBindSocket do
     begin
-      TLogger.LogarEmTela('ERRO: Porta ' + LPort.ToString + ' j· est· em uso!');
-      TLogger.LogarEmTela('Feche todas as outras inst‚ncias do serviÁo e tente novamente.');
+      TLogger.LogarEmTela('ERRO: Porta ' + Port.ToString + ' j√° est√° em uso!');
+      TLogger.LogarEmTela('Feche todas as outras inst√¢ncias do servi√ßo e tente novamente.');
       raise;
     end;
     on E: Exception do
@@ -106,8 +119,16 @@ begin
   end;
 end;
 
+procedure ConfigurarServidor;
+begin
+  THorse.MaxConnections := 200;
+  THorse.KeepConnectionAlive := true;
+end;
+
 begin
   ReportMemoryLeaksOnShutdown := true;
+
+  ConfigurarServidor;
   ConfigurarRotas;
   IniciarServidor;
   Readln;

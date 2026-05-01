@@ -4,7 +4,6 @@ interface
 
 uses
   Data.DB,
-  Data.Win.ADODB,
   System.JSON,
   System.SysUtils,
   System.DateUtils,
@@ -12,14 +11,7 @@ uses
 
 type
   TTarefaRepository = class
-  private
-    class var FInstance: TTarefaRepository;
   public
-    constructor Create;
-    destructor Destroy; override;
-
-   class function GetInstance: TTarefaRepository; static;
-
     function ListarPaginado(APage, ALimit: Integer; out ATotal: Integer): TJSONArray;
     procedure Incluir(ATarefa: TTarefaModel);
     procedure AtualizarStatus(AId: Integer; AStatus: string);
@@ -34,37 +26,21 @@ type
 implementation
 
 uses
-  Winapi.ActiveX, uConexaoBanco, Variants;
-
-constructor TTarefaRepository.Create;
-begin
-  inherited Create;
-  CoInitialize(nil)
-end;
-
-destructor TTarefaRepository.Destroy;
-begin
-  FInstance := nil;
-  CoUninitialize;
-  inherited;
-end;
-
-class function TTarefaRepository.GetInstance: TTarefaRepository;
-begin
-  if FInstance = nil then
-    FInstance := TTarefaRepository.Create;
-  Result := FInstance;
-end;
+  System.Variants, Data.Win.ADODB, uConexaoBanco;
 
 function TTarefaRepository.ListarPaginado(APage, ALimit: Integer; out ATotal: Integer): TJSONArray;
 var
+  Conn: TADOConnection;
   Qry: TADOQuery;
   Offset: Integer;
 begin
   Result := TJSONArray.Create;
-  Qry := TADOQuery.Create(nil);
+  Conn := nil;
+  Qry  := nil;
   try
-    Qry.Connection := TConexaoBanco.GetInstance.GetConnection;
+    Conn := TConexaoBanco.GetConnection;
+    Qry  := TADOQuery.Create(nil);
+    Qry.Connection := Conn;
 
     // Total de registros
     Qry.SQL.Text := 'SELECT COUNT(*) AS Total FROM Tarefas';
@@ -74,7 +50,7 @@ begin
     // Busca paginada
     Offset := (APage - 1) * ALimit;
     Qry.Close;
-    Qry.SQL.Text := 
+    Qry.SQL.Text :=
       'SELECT Id, Titulo, Descricao, Status, Prioridade, DataCriacao, DataConclusao ' +
       'FROM Tarefas ' +
       'ORDER BY DataCriacao DESC ' +
@@ -90,18 +66,24 @@ begin
       Qry.Next;
     end;
   finally
-    Qry.Free;
+    FreeAndNil(Qry);
+    TConexaoBanco.ReleaseConnection(Conn);
   end;
 end;
 
 procedure TTarefaRepository.Incluir(ATarefa: TTarefaModel);
 var
+  Conn: TADOConnection;
   Qry: TADOQuery;
 begin
-  Qry := TADOQuery.Create(nil);
+  Conn := nil;
+  Qry  := nil;
   try
-    Qry.Connection := TConexaoBanco.GetInstance.GetConnection;
-    Qry.SQL.Text := 
+    Conn := TConexaoBanco.GetConnection;
+    Qry  := TADOQuery.Create(nil);
+    Qry.Connection := Conn;
+
+    Qry.SQL.Text :=
       'INSERT INTO Tarefas (Titulo, Descricao, Status, Prioridade) ' +
       'VALUES (:Titulo, :Descricao, :Status, :Prioridade)';
 
@@ -116,17 +98,22 @@ begin
     Qry.Open;
     ATarefa.Id := Qry.FieldByName('Id').AsInteger;
   finally
-    Qry.Free;
+    FreeAndNil(Qry);
+    TConexaoBanco.ReleaseConnection(Conn);
   end;
 end;
 
 procedure TTarefaRepository.AtualizarStatus(AId: Integer; AStatus: string);
 var
+  Conn: TADOConnection;
   Qry: TADOQuery;
 begin
-  Qry := TADOQuery.Create(nil);
+  Conn := nil;
+  Qry  := nil;
   try
-    Qry.Connection := TConexaoBanco.GetInstance.GetConnection;
+    Conn := TConexaoBanco.GetConnection;
+    Qry  := TADOQuery.Create(nil);
+    Qry.Connection := Conn;
 
     Qry.SQL.Text :=
       'UPDATE Tarefas ' +
@@ -145,22 +132,29 @@ begin
 
     Qry.ExecSQL;
   finally
-    Qry.Free;
+    FreeAndNil(Qry);
+    TConexaoBanco.ReleaseConnection(Conn);
   end;
 end;
 
 procedure TTarefaRepository.Excluir(AId: Integer);
 var
+  Conn: TADOConnection;
   Qry: TADOQuery;
 begin
-  Qry := TADOQuery.Create(nil);
+  Conn := nil;
+  Qry  := nil;
   try
-    Qry.Connection := TConexaoBanco.GetInstance.GetConnection;
+    Conn := TConexaoBanco.GetConnection;
+    Qry  := TADOQuery.Create(nil);
+    Qry.Connection := Conn;
+
     Qry.SQL.Text := 'DELETE FROM Tarefas WHERE Id = :Id';
     Qry.Parameters.ParamByName('Id').Value := AId;
     Qry.ExecSQL;
   finally
-    Qry.Free;
+    FreeAndNil(Qry);
+    TConexaoBanco.ReleaseConnection(Conn);
   end;
 end;
 
@@ -170,44 +164,58 @@ end;
 
 function TTarefaRepository.TotalTarefas: Integer;
 var
+  Conn: TADOConnection;
   Qry: TADOQuery;
 begin
-  Qry := TADOQuery.Create(nil);
+  Conn := nil;
+  Qry  := nil;
   try
-    Qry.Connection := TConexaoBanco.GetInstance.GetConnection;
+    Conn := TConexaoBanco.GetConnection;
+    Qry  := TADOQuery.Create(nil);
+    Qry.Connection := Conn;
     Qry.SQL.Text := 'SELECT COUNT(*) AS Total FROM Tarefas';
     Qry.Open;
     Result := Qry.FieldByName('Total').AsInteger;
   finally
-    Qry.Free;
+    FreeAndNil(Qry);
+    TConexaoBanco.ReleaseConnection(Conn);
   end;
 end;
 
 function TTarefaRepository.MediaPrioridadePendentes: Double;
 var
+  Conn: TADOConnection;
   Qry: TADOQuery;
 begin
-  Qry := TADOQuery.Create(nil);
+  Conn := nil;
+  Qry  := nil;
   try
-    Qry.Connection := TConexaoBanco.GetInstance.GetConnection;
-    Qry.SQL.Text := 
+    Conn := TConexaoBanco.GetConnection;
+    Qry  := TADOQuery.Create(nil);
+    Qry.Connection := Conn;
+    Qry.SQL.Text :=
       'SELECT ISNULL(AVG(CAST(Prioridade AS FLOAT)), 0) AS Media ' +
       'FROM Tarefas WHERE Status = ''Pendente''';
     Qry.Open;
     Result := Qry.FieldByName('Media').AsFloat;
   finally
-    Qry.Free;
+    FreeAndNil(Qry);
+    TConexaoBanco.ReleaseConnection(Conn);
   end;
 end;
 
 function TTarefaRepository.QuantidadeConcluidasUltimos7Dias: Integer;
 var
+  Conn: TADOConnection;
   Qry: TADOQuery;
 begin
-  Qry := TADOQuery.Create(nil);
+  Conn := nil;
+  Qry  := nil;
   try
-    Qry.Connection := TConexaoBanco.GetInstance.GetConnection;
-    Qry.SQL.Text := 
+    Conn := TConexaoBanco.GetConnection;
+    Qry  := TADOQuery.Create(nil);
+    Qry.Connection := Conn;
+    Qry.SQL.Text :=
       'SELECT COUNT(*) AS Qtde ' +
       'FROM Tarefas ' +
       'WHERE Status = ''Concluida'' ' +
@@ -215,13 +223,9 @@ begin
     Qry.Open;
     Result := Qry.FieldByName('Qtde').AsInteger;
   finally
-    Qry.Free;
+    FreeAndNil(Qry);
+    TConexaoBanco.ReleaseConnection(Conn);
   end;
 end;
-
-initialization
-
-finalization
-  FreeAndNil(TTarefaRepository.FInstance);
 
 end.
